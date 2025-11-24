@@ -47,4 +47,36 @@ public class UserService {
                 .energyAlertingThreshold(user.getEnergyAlertingThreshold())
                 .build();
     }
+
+    public UserDto getUserById(Long userId) {
+        log.info("Get user by ID {}", userId);
+
+        return userRepository.findById(userId)
+                .map(this::toDto)
+                .orElse(null);
+    }
+
+    public void updateUser(Long userId, UserDto userDto) {
+        log.info("User id to update userDetails {} {}", userId, userDto);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User Not Found"));
+
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
+        user.setAddress(userDto.getAddress());
+        user.setAlerting(userDto.isAlerting());
+        user.setEnergyAlertingThreshold(userDto.getEnergyAlertingThreshold());
+
+        userRepository.save(user);
+    }
+
+    public void deleteUser(Long id) {
+        log.info("User id to delete userDetails {} {}", id);
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User Not Found"));
+
+        userRepository.delete(user);
+    }
 }
