@@ -13,5 +13,94 @@ services:
       - db-data:/var/lib/mysql
       - db-data:/var/log/mysql
 
+  kafka:
+    container_name: kafka  # Container name easier reference for docker commands
+    image: apache/kafka:latest # latest image from kafka image to spring in docker container
+    ports:
+      - "9092:9092" # Internal Listener (Docker network) - other container spring boot ca reach kafka using kafka:9092
+      - "9094:9094" # External Listener (host machine) - like host IDE to connect via localhost:9094
+    environment:
+    # KRaft MetaData & Node Identity
+    # Tip: For a single-node dev setup, this is fine. For multi-node clusters, each node should have a unique ID.
+
+      #Unique ID for this Kafka node for cluster identification
+      KAFKA_NODE_ID: 1
+
+      # Unique kafka cluster identifier (required for KRaft mode) - cluster metadata
+      KAFKA_CLUSTER_ID: 'energy-tracker-cluster-1'
+
+      # Node roles-this instance will act as Both a broker and controller
+        # -broker : handles producing/consuming message,
+        # -controller: manage partition leadership and metadata
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+
+    #Controller Quorum Configuration (Raft)
+
+      #List of controller nodes that form the Raft quorum
+      KAFKA_CONTROLLER_QUORUN_VOTERS: '1@kafka:9093' # this is a single-node cluster, your controller ID is 1 and endpoint is kafka:9093.
+      # Listener name used by controllers for internal Raft communication
+        # Kafka controllers use a dedicated listener for Raft communication. You named it CONTROLLER.
+      KAFKA_CONTROLLER_LISTNER_NAMES: 'CONTROLLER'
+
+    # Network Listeners (Internal, External & Controller)
+      # Define all Listener endpoints for this kafka node
+        # PLAINTEXT → Internal Docker communication.
+        # EXTERNAL → Host machine communication.
+        # CONTROLLER → Controller quorum (Raft) communication.
+      KAFKA_LISTENERS: >
+        PLAINTEXT://0.0.0.0:9092,
+        EXTERNAL://0.0.0.0:9094,
+        CONTROLLER://0.0.0.0:9093
+
+      # What each listener advertises to connecting clients
+      # Internal (Docker containers): kafka:9092
+      # External (host machine): localhost:9094
+      KAFKA_ADVERTISED_LISTENERS: >
+        PLAINTEXT://kafka:9092,
+        EXTERNAL://localhost:9094
+
+      # Maps listener names to their security protocols
+        # Maps listener names to protocol (here all are PLAINTEXT; no SSL yet).
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP:
+        CONTROLLER:PLAINTEXT,
+        PLAINTEXT:PLAINTEXT,
+        EXTERNAL:PLAINTEXT
+
+      # Which Listener brokers should use for internal communication
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+
+      # Single-Node Cluster Safety Settings (because replication > 1 would break)
+        # Number of replicas for internal topics (like consumer offsets). Single-node cluster → must be 1.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+        # Minimum in-sync replicas for transaction topics → 1 in single-node.
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+    # Broker Defaults & Quality-of-life Settings
+      #Speed up consumer group startup
+        # How long a consumer group waits before rebalancing. Setting 0 makes consumer startup faster.
+      KAFKA_GROUP_INITIAL_REBALACNE_DELAY_MS: 0
+      #Kafka will auto-create topics if they don’t exist when you try to produce to them.
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      #Default number of partitions per topic, Single partition for simplicity in dev.
+      KAFKA_NUM_PARTITIONS: 1
+
+    volumes:
+      - ./docker/kafka_data:/var/lib/kafka/data
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: ghcr.io/kafbat/kafka-ui:latest
+    ports:
+      - "8070:8080"
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      DYNAMIC_CONFIG_ENABLED: 'true'
+    restart: unless-stopped
+
 volumes:
   db-data:
+  kafka-data:
