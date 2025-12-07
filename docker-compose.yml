@@ -37,10 +37,10 @@ services:
     #Controller Quorum Configuration (Raft)
 
       #List of controller nodes that form the Raft quorum
-      KAFKA_CONTROLLER_QUORUN_VOTERS: '1@kafka:9093' # this is a single-node cluster, your controller ID is 1 and endpoint is kafka:9093.
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093' # this is a single-node cluster, your controller ID is 1 and endpoint is kafka:9093.
       # Listener name used by controllers for internal Raft communication
         # Kafka controllers use a dedicated listener for Raft communication. You named it CONTROLLER.
-      KAFKA_CONTROLLER_LISTNER_NAMES: 'CONTROLLER'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
 
     # Network Listeners (Internal, External & Controller)
       # Define all Listener endpoints for this kafka node
@@ -79,7 +79,7 @@ services:
     # Broker Defaults & Quality-of-life Settings
       #Speed up consumer group startup
         # How long a consumer group waits before rebalancing. Setting 0 makes consumer startup faster.
-      KAFKA_GROUP_INITIAL_REBALACNE_DELAY_MS: 0
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       #Kafka will auto-create topics if they don’t exist when you try to produce to them.
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       #Default number of partitions per topic, Single partition for simplicity in dev.

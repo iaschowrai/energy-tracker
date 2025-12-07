@@ -1,13 +1,11 @@
 package com.iaschowrai.user_service.controller;
 
 import com.iaschowrai.user_service.dto.UserDto;
-import com.iaschowrai.user_service.entity.User;
 import com.iaschowrai.user_service.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/users")
