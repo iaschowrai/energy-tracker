@@ -1,7 +1,7 @@
 package com.iaschowrai.ingestion_service.service.impl;
 
 import com.iaschowrai.ingestion_service.dto.EnergyUsageDto;
-import com.iaschowrai.ingestion_service.kafka.event.EnergyUsageEvent;
+import com.iaschowrai.kafka.event.EnergyUsageEvent;
 import com.iaschowrai.ingestion_service.service.IngestionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

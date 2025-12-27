@@ -77,7 +77,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
 
     # Broker Defaults & Quality-of-life Settings
-      #Speed up consumer group startup
+      # Speed up consumer group startup
         # How long a consumer group waits before rebalancing. Setting 0 makes consumer startup faster.
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       #Kafka will auto-create topics if they don’t exist when you try to produce to them.
@@ -100,6 +100,23 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
       DYNAMIC_CONFIG_ENABLED: 'true'
     restart: unless-stopped
+
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    ports:
+      - "8072:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=password
+      - DOCKER_INFLUXDB_INIT_ORG=iaschowrai
+      - DOCKER_INFLUXDB_INIT_BUCKET=usage-bucket
+      - DOCKER_INFLUXDB_INIT_RETENTION=1w
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-token
+    volumes:
+      - ./influxdb_data:/var/lib/influxdb2
 
 volumes:
   db-data:

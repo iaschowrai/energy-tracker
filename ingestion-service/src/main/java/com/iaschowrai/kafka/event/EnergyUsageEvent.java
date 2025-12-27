@@ -1,4 +1,4 @@
-package com.iaschowrai.ingestion_service.kafka.event;
+package com.iaschowrai.kafka.event;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
