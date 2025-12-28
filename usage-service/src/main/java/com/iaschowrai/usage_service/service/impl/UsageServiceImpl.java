@@ -159,7 +159,7 @@ public class UsageServiceImpl {
                                 "Total Consumption: {}, Threshold: {}",
                         userId, totalConsumption, threshold);
 
-                // Put message on kafak alert-topic
+                // Put message on kafka alert-topic
                 final AlertingEvent alertingEvent = AlertingEvent.builder()
                         .userId(userId)
                         .message("Energy consumption threshold exceeded")
